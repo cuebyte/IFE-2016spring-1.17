@@ -47,26 +47,48 @@ var chartData = {};
 
 // 记录当前页面的表单选项
 var pageState = {
-  nowSelectCity: -1,
-  nowGraTime: 'day'
+  'nowSelectCity': '北京',
+  'nowGraTime': 'day'
+}
+var lastState = {}
+
+function draw(type, height, color, date) {
+  return '<div class="'+type+' box"><div class="pill" style="height:'+height+'px;background-color:'+color+';" title="'+date+' : '+height+'"></div></div>'
 }
 
 /**
  * 渲染图表
  */
 function renderChart() {
+  console.log(lastState)
+  console.log(pageState)
+  console.log(chartData)
+  if (lastState['nowSelectCity'] === pageState['nowSelectCity'] && lastState['nowGraTime'] === pageState['nowGraTime']) {
+    return
+  } else {
+    lastState['nowSelectCity'] = pageState['nowSelectCity']
+    lastState['nowGraTime'] = pageState['nowGraTime']
+  }
 
+  var wrap = document.getElementById('aqi-chart-wrap')
+  wrap.innerHTML = ''
+  var data = chartData[pageState['nowSelectCity']][pageState['nowGraTime']]
+  var html = ''
+  for (var date in data) {
+    html += draw(pageState['nowGraTime'], data[date]['aqi'], data[date]['color'], date)
+  }
+  wrap.innerHTML = html
 }
 
 /**
  * 日、周、月的radio事件点击时的处理函数
  */
 function graTimeChange() {
-  // 确定是否选项发生了变化
-
-  // 设置对应数据
-
-  // 调用图表渲染函数
+  var types = document.getElementsByName('gra-time')
+  Array.prototype.forEach.call(types, function(x) {
+    if(x.checked) pageState['nowGraTime'] = x.value
+  })
+  renderChart()
 }
 
 /**
@@ -74,17 +96,21 @@ function graTimeChange() {
  */
 function citySelectChange() {
   // 确定是否选项发生了变化
-
+  pageState['nowSelectCity'] = document.getElementById('city-select').value
   // 设置对应数据
 
+  // Array.prototype.forEach.call(cites, function(x) {
+  //   if(x.checked) pageState['nowSelectCity'] = x.value
+  // })
   // 调用图表渲染函数
+  renderChart()
 }
 
 /**
  * 初始化日、周、月的radio事件，当点击时，调用函数graTimeChange
  */
 function initGraTimeForm() {
-  [].forEach.call(document.getElementsByName('gra-time'), function(value) {
+  Array.prototype.forEach.call(document.getElementsByName('gra-time'), function(value) {
     value.addEventListener('click', graTimeChange)
   })
 }
@@ -123,9 +149,9 @@ function initAqiChartData() {
   for (var city in aqiSourceData) {
     var aqis = aqiSourceData[city]
     chartData[city] = {
-      'daily': {},
-      'weekly': {},
-      'monthly': {}
+      'day': {},
+      'week': {},
+      'month': {}
     }
     var month = lastMonth = ''
     var mSum = mDay = mAqi = 0
@@ -135,7 +161,7 @@ function initAqiChartData() {
       month = date.slice(0, 7) // '2016-01'
       if (lastMonth && lastMonth !== month) {
         mAqi = Math.round(wSum / wDay)
-        chartData[city]['monthly'][month] = { 'aqi': mAqi, 'color': getColor(mAqi) }
+        chartData[city]['month'][month] = { 'aqi': mAqi, 'color': getColor(mAqi) }
         mSum = mDay = 0
       }
       lastMonth = month
@@ -145,21 +171,20 @@ function initAqiChartData() {
       // week
       if (wDay === 7) {
         wAqi = Math.round(wSum / wDay)
-        chartData[city]['weekly'][date] = { 'aqi': wAqi, 'color': getColor(wAqi) }
+        chartData[city]['week'][date] = { 'aqi': wAqi, 'color': getColor(wAqi) }
         wSum = wDay = 0
       }
       wSum += aqis[date]
       wDay += 1
 
       // day
-      chartData[city]['daily'][date] = { 'aqi': aqis[date], 'color': getColor(aqis[date]) }
+      chartData[city]['day'][date] = { 'aqi': aqis[date], 'color': getColor(aqis[date]) }
     }
     mAqi = Math.round(wSum / wDay)
     wAqi = Math.round(wSum / wDay)
-    chartData[city]['monthly'][lastMonth] = { 'aqi': mAqi, 'color': getColor(mAqi) }
-    chartData[city]['weekly'][date] = { 'aqi': wAqi, 'color': getColor(wAqi) }
+    chartData[city]['month'][lastMonth] = { 'aqi': mAqi, 'color': getColor(mAqi) }
+    chartData[city]['week'][date] = { 'aqi': wAqi, 'color': getColor(wAqi) }
   }
-  console.log(chartData)
 }
 
 /**
@@ -167,8 +192,9 @@ function initAqiChartData() {
  */
 function init() {
   initGraTimeForm()
-  initCitySelector();
-  initAqiChartData();
+  initCitySelector()
+  initAqiChartData()
+  renderChart()
 }
 
 init();

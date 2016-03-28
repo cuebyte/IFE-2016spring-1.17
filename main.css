@@ -1,0 +1,35 @@
+/** {
+  margin: 0;
+  padding: 0;
+}*/
+
+#aqi-chart-wrap {
+  border: 1px solid gray;
+  margin: 0 auto;
+  width: 100%;
+
+  /*overflow: hidden;*/
+  height: 500px
+}
+
+.box {
+  position: relative;
+  float: left;
+  height: inherit;
+}
+
+.pill {
+  position: absolute;
+  bottom: 0;
+  width: inherit;
+}
+
+.month {
+  width: 30px;
+}
+.week {
+  width: 20px;
+}
+.day {
+  width: 10px;
+}

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>IFE JavaScript Task 01</title>
+    <link rel="stylesheet" href="main.css" media="screen" title="no title" charset="utf-8">
   </head>
 <body>
   <fieldset id="form-gra-time">
@@ -27,7 +28,16 @@
     </select>
   </fieldset>
 
-  <div class="aqi-chart-wrap">
+  <div id="aqi-chart-wrap">
+    <div class="box month">
+      <div class="pill" style="height:25px;background-color:red;"></div>
+    </div>
+    <div class="box month">
+      <div class="pill" style="height:5px;background-color:green;"></div>
+    </div>
+    <div class="box month">
+      <div class="pill" style="height:50px;background-color:black;"></div>
+    </div>
   </div>
   <script src="https://cdn.bootcss.com/jquery/3.0.0-beta1/jquery.min.js"></script>
   <script src="main.js"></script>
